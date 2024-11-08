@@ -15,11 +15,12 @@ calculatorInput.addEventListener('keydown', function (event) {
   if (
     (event.key >= '0' && event.key <= '9') ||
     allowedKeys.indexOf(event.key) !== -1 ||
-    event.key === ',' ||
     event.key === '+' ||
     event.key === '-' ||
     event.key === '*' ||
     event.key === '/' ||
+    event.key === ',' ||
+    event.key === '%' ||
     (event.ctrlKey && event.key === 'a') // Ctrl + A для выделения всего
   )
     return;

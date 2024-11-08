@@ -14,34 +14,41 @@
   <body>
     <div class="calc-wrapper">
       <div class="result-area">
-        <input type="text" />
+        <input
+          type="text"
+          class="result-area__prev"
+          id="prevAction"
+          value=""
+          disabled
+        />
         <input
           type="text"
           id="calculatorInput"
           class="result-area__input"
           placeholder="0"
+          autocomplete="off"
         />
       </div>
       <div class="buttons">
-        <button class="buttons__button">AC</button>
-        <button class="buttons__button">+/-</button>
-        <button class="buttons__button">%</button>
-        <button class="buttons__button">÷</button>
+        <button class="buttons__button button_color_light">AC</button>
+        <button class="buttons__button button_color_light">+/-</button>
+        <button class="buttons__button button_color_light">%</button>
+        <button class="buttons__button button_color_blue">÷</button>
         <button class="buttons__button">7</button>
         <button class="buttons__button">8</button>
         <button class="buttons__button">9</button>
-        <button class="buttons__button">×</button>
+        <button class="buttons__button button_color_blue">×</button>
         <button class="buttons__button">4</button>
         <button class="buttons__button">5</button>
         <button class="buttons__button">6</button>
-        <button class="buttons__button">-</button>
+        <button class="buttons__button button_color_blue">-</button>
         <button class="buttons__button">1</button>
         <button class="buttons__button">2</button>
         <button class="buttons__button">3</button>
-        <button class="buttons__button">+</button>
-        <button class="buttons__button buttons__button_col_1-3">0</button>
+        <button class="buttons__button button_color_blue">+</button>
+        <button class="buttons__button button_col_1-3">0</button>
         <button class="buttons__button">,</button>
-        <button class="buttons__button">=</button>
+        <button class="buttons__button button_color_blue">=</button>
       </div>
     </div>
   </body>
