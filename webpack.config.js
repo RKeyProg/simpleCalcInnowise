@@ -1,29 +1,36 @@
 /* eslint-disable no-undef */
-import HtmlWebpackPlugin from 'html-webpack-plugin';
-import { join, resolve } from 'path';
+const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
-export const entry = './src/index.js';
-export const output = {
-  filename: 'bundle.js',
-  path: resolve(__dirname, 'dist'),
-};
-export const module = {
-  rules: [
-    {
-      test: /\.css$/, // Регулярное выражение для обработки файлов с расширением .css
-      use: ['style-loader', 'css-loader'], // Загрузчики, используемые для обработки CSS-файлов
-    },
-  ],
-};
-export const plugins = [
-  new HtmlWebpackPlugin({
-    template: './src/index.html',
-  }),
-];
-export const devServer = {
-  static: {
-    directory: join(__dirname, 'dist'), // Каталог для статики
+module.exports = {
+  entry: './src/index.js',
+
+  output: {
+    filename: 'bundle.js',
+    path: path.resolve(__dirname, 'dist'),
   },
-  open: true, // Автоматически открывать браузер
+
+  module: {
+    rules: [
+      {
+        test: /\.css$/, // Регулярное выражение для обработки файлов с расширением .css
+        use: ['style-loader', 'css-loader'], // Загрузчики, используемые для обработки CSS-файлов
+      },
+    ],
+  },
+
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: './src/index.html',
+    }),
+  ],
+
+  devServer: {
+    static: {
+      directory: path.join(__dirname, 'dist'), // Каталог для статики
+    },
+    open: true, // Автоматически открывать браузер
+  },
+
+  mode: 'development',
 };
-export const mode = 'development';
