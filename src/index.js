@@ -1,3 +1,3 @@
-import './scripts/calculate.js';
-import './scripts/input-validation.js';
+import './scripts/calc.js';
+import './scripts/theme-control.js';
 import './styles.css';

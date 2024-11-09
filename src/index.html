@@ -13,6 +13,12 @@
   </head>
   <body>
     <div class="calc-wrapper">
+      <label class="theme-switcher">
+        <input type="checkbox" class="theme-switcher__input" />
+        <div class="theme-switcher__button">
+          <div class="theme-switcher__circle"></div>
+        </div>
+      </label>
       <div class="result-area">
         <input
           type="text"
@@ -30,25 +36,44 @@
         />
       </div>
       <div class="buttons">
-        <button class="buttons__button button_color_light">AC</button>
-        <button class="buttons__button button_color_light">+/-</button>
-        <button class="buttons__button button_color_light">%</button>
-        <button class="buttons__button button_color_blue">÷</button>
-        <button class="buttons__button">7</button>
-        <button class="buttons__button">8</button>
-        <button class="buttons__button">9</button>
-        <button class="buttons__button button_color_blue">×</button>
-        <button class="buttons__button">4</button>
-        <button class="buttons__button">5</button>
-        <button class="buttons__button">6</button>
-        <button class="buttons__button button_color_blue">-</button>
-        <button class="buttons__button">1</button>
-        <button class="buttons__button">2</button>
-        <button class="buttons__button">3</button>
-        <button class="buttons__button button_color_blue">+</button>
-        <button class="buttons__button button_col_1-3">0</button>
-        <button class="buttons__button">,</button>
-        <button class="buttons__button button_color_blue">=</button>
+        <button data-value="reset" class="buttons__button button_color_light">
+          AC
+        </button>
+        <button
+          data-value="changeSign"
+          class="buttons__button button_color_light"
+        >
+          +/-
+        </button>
+        <button data-value="%" class="buttons__button button_color_light">
+          %
+        </button>
+        <button data-value="/" class="buttons__button button_color_blue">
+          ÷
+        </button>
+        <button data-value="7" class="buttons__button">7</button>
+        <button data-value="8" class="buttons__button">8</button>
+        <button data-value="9" class="buttons__button">9</button>
+        <button data-value="*" class="buttons__button button_color_blue">
+          ×
+        </button>
+        <button data-value="4" class="buttons__button">4</button>
+        <button data-value="5" class="buttons__button">5</button>
+        <button data-value="6" class="buttons__button">6</button>
+        <button data-value="-" class="buttons__button button_color_blue">
+          -
+        </button>
+        <button data-value="1" class="buttons__button">1</button>
+        <button data-value="2" class="buttons__button">2</button>
+        <button data-value="3" class="buttons__button">3</button>
+        <button data-value="+" class="buttons__button button_color_blue">
+          +
+        </button>
+        <button data-value="0" class="buttons__button button_col_1-3">0</button>
+        <button data-value="," class="buttons__button">,</button>
+        <button data-value="=" class="buttons__button button_color_blue">
+          =
+        </button>
       </div>
     </div>
   </body>
