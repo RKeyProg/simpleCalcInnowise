@@ -26,6 +26,7 @@ body {
   align-items: center;
   font-family: 'Work Sans', sans-serif;
   transition: all 0.3s ease;
+  overflow: hidden;
 }
 
 body.light-theme {
