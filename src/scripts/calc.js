@@ -86,39 +86,66 @@ function isCurrentKeyValid(event) {
     return false;
   }
 
-  // Запрет на ввод двух операторов подряд
-  // if (isOperator && isOperatorLast()) {
-  //   if (event.key === ',') return false;
-  //   calculatorInput.value = calculatorInput.value.slice(0, -1) + event.key;
-  //   return false;
-  // }
+  let lastOperator = getLastOperator();
 
-  // if (event.key === ',' && isNumberHasComma()) {
-  //   return false;
-  // }
+  if (lastOperator === '%' && event.key >= '0' && event.key <= '9') {
+    return false;
+  } else if (
+    lastOperator === '%' &&
+    (event.key === '-' ||
+      event.key === '+' ||
+      event.key === '*' ||
+      event.key === '/')
+  ) {
+    return true;
+  } else if (
+    event.key === '-' &&
+    (lastOperator === '%' ||
+      lastOperator === '*' ||
+      lastOperator === '/' ||
+      lastOperator === '+')
+  ) {
+    return true;
+  } else if (event.key === '-' && lastOperator === '-') {
+    return false;
+  }
+
+  if (isOperator && lastOperator) {
+    if (event.key === ',') return false;
+
+    calculatorInput.value = calculatorInput.value.slice(0, -1) + event.key;
+    return false;
+  }
+
+  // Запрет на ввод больше двух запятых в числе
+  if (event.key === ',' && isNumberHasComma()) {
+    return false;
+  }
 
   return true;
 }
 
-// function isOperatorLast() {
-//   const lastChar = calculatorInput.value.charAt(
-//     calculatorInput.value.length - 1
-//   );
+function getLastOperator() {
+  const lastChar = calculatorInput.value.charAt(
+    calculatorInput.value.length - 1
+  );
 
-//   return ['+', '-', '*', '/', ',', '%'].includes(lastChar);
-// }
+  if (['+', '-', '*', '/', ',', '%'].includes(lastChar)) return lastChar;
 
-// function isNumberHasComma() {
-//   const lastNumberPart = calculatorInput.value
-//     .split(/[+\-*/%]/)
-//     .pop()
-//     .trim();
-//   if (lastNumberPart.includes(',')) {
-//     return true;
-//   }
+  return '';
+}
 
-//   return false;
-// }
+function isNumberHasComma() {
+  const lastNumberPart = calculatorInput.value
+    .split(/[+\-*/%]/)
+    .pop()
+    .trim();
+  if (lastNumberPart.includes(',')) {
+    return true;
+  }
+
+  return false;
+}
 
 function formatInput(val) {
   let currentValue = val.toString().replace(/\s/g, '').replace(/\./g, ',');
@@ -136,90 +163,99 @@ function formatInput(val) {
 
 function calculate(expression) {
   // Убираем все пробелы
-  expression = expression.replace(/\s+/g, '');
+  expression = expression.replace(/\s+/g, '').replace(/,/g, '.');
 
-  // Проверяем наличие числа в начале или отрицательного числа
-  if (!/^-?\d/.test(expression)) {
-    prevAction.value = 'Error';
-    return '';
+  // Функция для вычисления двух чисел с оператором
+  function operate(a, b, operator) {
+    switch (operator) {
+      case '+':
+        return a + b;
+      case '-':
+        return a - b;
+      case '*':
+        return a * b;
+      case '/':
+        return a / b;
+      default:
+        return b;
+    }
   }
 
+  // Функция для вычисления выражения с приоритетами
+  function evaluate(numbers, operators) {
+    const values = [];
+    const ops = [];
+
+    for (let i = 0; i < numbers.length; i++) {
+      values.push(parseFloat(numbers[i])); // Преобразуем строку в число
+      if (i < operators.length) {
+        while (
+          ops.length &&
+          precedence(ops[ops.length - 1]) >= precedence(operators[i])
+        ) {
+          const b = values.pop();
+          const a = values.pop();
+          const op = ops.pop();
+          values.push(operate(a, b, op));
+        }
+        ops.push(operators[i]);
+      }
+    }
+
+    while (ops.length) {
+      const b = values.pop();
+      const a = values.pop();
+      const op = ops.pop();
+      values.push(operate(a, b, op));
+    }
+
+    return values[0];
+  }
+
+  // Определяем приоритет операторов
+  function precedence(operator) {
+    if (operator === '+' || operator === '-') return 1;
+    if (operator === '*' || operator === '/') return 2;
+    return 0;
+  }
+
+  // Создаем массивы для чисел и операторов
   let numbers = [];
   let operators = [];
+  let numberBuffer = '';
 
-  // Функция для выполнения арифметических операций
-  function operate(num1, num2, operator) {
-    if (operator === '+') return num1 + num2;
-    if (operator === '-') return num1 - num2;
-    if (operator === '*') return num1 * num2;
-    if (operator === '/') return num1 / num2;
-  }
+  for (let i = 0; i < expression.length; i++) {
+    const char = expression[i];
 
-  let i = 0;
-  while (i < expression.length) {
-    let char = expression[i];
-
-    // Если символ - цифра или часть числа (может быть десятичная точка)
-    if (/\d/.test(char) || char === '-') {
-      let numStr = char;
-
-      // Обрабатываем многосимвольные числа
-      while (i + 1 < expression.length && /[.\d]/.test(expression[i + 1])) {
-        numStr += expression[i + 1];
-        i++;
-      }
-
-      // Проверяем на наличие символа '%'
-      if (i + 1 < expression.length && expression[i + 1] === '%') {
-        numbers.push(numStr + '%');
-        i++; // пропускаем символ '%'
-      } else {
-        numbers.push(parseFloat(numStr));
-      }
-    } else if (/[+\-*/]/.test(char)) {
-      operators.push(char);
-    }
-
-    i++;
-  }
-
-  // Обработка процентов и преобразование их в дробные значения
-  [numbers, operators] = preprocessExpression(
-    numbers.map((item) => item.toString()),
-    operators
-  );
-
-  // Обработка умножения и деления сначала
-  const newNumbers = [];
-  const newOperators = [];
-
-  for (let i = 0; i < operators.length; i++) {
-    if (operators[i] === '*' || operators[i] === '/') {
-      let num1 = newNumbers.pop() || numbers[i];
-      let num2 = numbers[i + 1];
-
-      if (operators[i] === '/' && num2 === 0) {
-        prevAction.value = 'Infinity';
-        return '';
-      }
-
-      newNumbers.push(operate(num1, num2, operators[i]));
+    if (!isNaN(char) || char === '.' || (char === '%' && numberBuffer)) {
+      // Если это цифра, точка или % после числа, собираем число
+      numberBuffer += char;
     } else {
-      newNumbers.push(numbers[i]);
-      newOperators.push(operators[i]);
+      // Если текущий символ - знаком минус и это либо первый символ,
+      // либо предшествующий символ - оператор, то это часть числа
+      if (char === '-' && (i === 0 || '+-*/'.includes(expression[i - 1]))) {
+        numberBuffer += char; // Добавляем знак минус к числу
+      } else {
+        if (numberBuffer) {
+          numbers.push(numberBuffer); // Добавляем собранное число с % если есть
+          numberBuffer = ''; // Сбрасываем буфер
+        }
+        if ('+-*/'.includes(char)) {
+          operators.push(char); // Добавляем оператор
+        }
+      }
     }
   }
 
-  newNumbers.push(numbers[numbers.length - 1]); // Добавляем последнее число
-
-  // Обработка сложения и вычитания
-  let result = newNumbers[0];
-  for (let i = 0; i < newOperators.length; i++) {
-    result = operate(result, newNumbers[i + 1], newOperators[i]);
+  if (numberBuffer) {
+    numbers.push(numberBuffer); // Добавляем последнее число
   }
+  [numbers, operators] = preprocessExpression(numbers, operators);
 
-  return result;
+  // Вычисляем итоговое значение
+  return evaluate(numbers, operators);
 }
+
 // Предобработка выражения для замены процентов
 function preprocessExpression(numbers, operators) {
   // Выбираем индексы с символом %
@@ -230,11 +266,12 @@ function preprocessExpression(numbers, operators) {
     .filter((item) => item !== undefined);
 
   numbers = numbers.map((item) => {
-    if (item.includes('%')) return +item.slice(0, -1);
-    return +item;
+    if (item.includes('%')) return parseFloat(item.slice(0, -1));
+    return parseFloat(item);
   });
+
   // Если таких нет - возвращаем исходные массивы
-  if (percentIndex === -1) return [numbers, operators];
+  if (percentIndex.length === 0) return [numbers, operators];
 
   // перебор всех индексов где нужно искать процент
   percentIndex.forEach((currentIndex) => {
@@ -272,6 +309,7 @@ calculatorInput.addEventListener('keydown', function (event) {
     prevAction.value = calculatorInput.value;
     const result = formatInput(calculate(calculatorInput.value));
     calculatorInput.value = result;
+    checkFontSize();
     event.preventDefault();
   }
 });
